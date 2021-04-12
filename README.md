@@ -16,9 +16,9 @@ Table of contents:
 - Add information in that file:
     ```javascript
       Host te-aws-website-api
-      HostName 13.228.46.14
-      User ubuntu
-      IdentityFile ~/.ssh/privatekeyfilename
+      	HostName 13.228.46.14
+      	User ubuntu
+      	IdentityFile ~/.ssh/privatekeyfilename
     ```
 	to config file.
 - Open terminal typing `ssh te-aws-website-api` to connect to server.
