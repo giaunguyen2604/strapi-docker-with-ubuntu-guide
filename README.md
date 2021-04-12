@@ -9,6 +9,7 @@ Table of contents:
 4. [Install DBMS (Mysql)](#dbms)
 5. [Config Strapi App](#cfstrapi)
 6. [Config Nginx](#cfnginx)
+7. [Add SSL](#ssl)
 ### 1. Connect to Server <a name='connect'></a>
 - Generate key pair (public/private)
 - Open folder ~/.ssh create a config file with name is `config`
@@ -241,7 +242,7 @@ sudo apt install nginx
   docker run -p 3306:3306 -d --name mysql -e MYSQL_ROOT_PASSWORD=password mysql/mysql-server
   ```
 
-  `Note: 3306:3306 &#8594; port local : port docker`
+  Note: 3306:3306 &#8594; port local : port docker
 
 - Verify with command: `docker ps` (list all Images)
 - Login to MySQL within the docker container using the docker exec command: 
@@ -262,7 +263,7 @@ sudo apt install nginx
 - Create a database with command: `CREATE DATABASE testDB;`
 ### 5. Config Strapi App <a name='cfstrapi'></a>
 - In `config` folder of Strapi App source, , modify the `database.js` file with fields such as `client`, `host`, `post`, `database`, `username`, `password` which match with the information created at step 4.
- 
+- You must install package `mysql2` before: `yarn add mysql2`.
  Here is an example:
  ```javascript
  module.exports = ({ env }) => ({
@@ -283,6 +284,42 @@ sudo apt install nginx
   },
 });
  ```
-You must install package `mysql2` before: `yarn ad mysql2`.
+ - You need a process management such as PM2 to keep your app running 24/7. To install typing `yarn global add pm2`
+ - Command to PM2 working with scripts in `package.json`: 
+ ```js
+ pm2 start yarn --interpreter bash --name nameprocess -- start
+ ```
+ &#8594; `-- start is a script in package.json`
 ### 6. Config Nginx <a name='cfnginx'></a>
+Source: [Document in Strapi website](https://strapi.io/documentation/developer-docs/latest/setup-deployment-guides/deployment/optional-software/nginx-proxy.html)
+In `/etc/nginx/sites-available/strapi.conf`:
+```js
+server {
+    # Listen HTTP
+    listen 80;
+    server_name {your_servername || IP Address};
+
+     # Proxy Config
+    location / {
+        proxy_pass http://{id_address}:{port};
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Server $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_pass_request_headers on;
+    }
+}
+```
+- Creating a link from it to the sites-enabled directory:
+```js
+sudo ln -s /etc/nginx/sites-available/strapi.conf /etc/nginx/sites-enabled/
+```
+### 7. Add SSL <a name='ssl'></a>
+- Follow the steps in the document: [Link document](https://certbot.eff.org/lets-encrypt/ubuntufocal-nginx)
+
 
