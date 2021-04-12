@@ -117,10 +117,124 @@ As you can see, only the root user has the read and write flags enabled.
 ### 3. Install & Setup Environment <a name='environment'></a>
 #### 3.1. Install Docker <a name='docker'></a>
 Source: [Click to go to document](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
-
+- First, update your existing list of packages:
+  ```js
+  sudo apt update
+  ```
+- Install a few prerequisite packages which let apt use packages over HTTPS:
+  ```js
+  sudo apt install apt-transport-https ca-certificates curl software-properties-common
+  ```
+- Add the GPG key for the official Docker repository to your system:
+  ```js
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  ```
+- Add the Docker repository to APT sources:
+  ```js
+  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+  ```
+- Update the package database with the Docker packages:
+  ```js
+  sudo apt update
+  ```
+- Make sure you are about to install from the Docker repo instead of the default Ubuntu repo:
+  ```js
+  apt-cache policy docker-ce
+  ```
+- `docker-ce` is not installed, but the candidate for installation is from the Docker repository for Ubuntu
+- Finally, install Docker:
+  ```js
+  sudo apt install docker-ce
+  ```
+- Check that it’s running:
+  ```js
+  sudo systemctl status docker
+  ```
+##### Executing the Docker Command Without Sudo
+If you want to avoid typing sudo whenever you run the docker command:
+- Add your username to the docker group:
+  ```js
+  sudo usermod -aG docker ${USER}
+  ```
+- To apply the new group membership, type the following:
+  ```js
+  su - ${USER}
+  ```
+- Confirm that your user is now added to the docker group:
+  ```js
+  id -nG
+  ```
 #### 3.2. Install Nginx <a name='nginx'></a>
 Source: [Click to go to document](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04)
 
+**1. Install Nginx**
+```JS
+sudo apt update
+sudo apt install nginx
+```
+**2. Checking your Web Server**
+- Check with the systemd init system to make sure the service is running:
+  ```js
+  systemctl status nginx
+  ```
+- ```js
+  ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//'
+  ```
+- Enter it into your browser’s address bar:
+  ```js
+  http://your_server_ip
+  ```
+**3. Setting Up Server Blocks (Recommended)**
+- Create the directory for `example.com` as follows, using the `-p` flag to create any necessary parent directories:
+  ```js
+  sudo mkdir -p /var/www/example.com/html
+  ```
+- Assign ownership of the directory with the `$USER` environment variable:
+  ```js
+  sudo chown -R $USER:$USER /var/www/example.com/html
+  ```
+- ```js
+  sudo chmod -R 755 /var/www/example.com
+  ```
+- Create a sample `index.html` page using nano or your favorite editor:
+  ```js
+  nano /var/www/example.com/html/index.html
+  ```
+- Inside, add the sample HTML (such as print Hello world) &#8594; Save and close the file when you are finished.
+- Let’s make a new file at `/etc/nginx/sites-available/example.com`
+- Paste in the following configuration block:
+  ```js
+  server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/example.com/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name example.com www.example.com;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+  }
+  ```
+- Creating a link from it to the sites-enabled directory, which Nginx reads from during startup:
+  ```js
+  sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+  ```
+- To avoid a possible hash bucket memory problem. Open the file:
+  ```js
+  sudo nano /etc/nginx/nginx.conf
+  ```
+- Find the `server_names_hash_bucket_size` directive and remove the **#** symbol &#8594; save and close file.
+- Test your Nginx files: 
+  ```js
+  sudo nginx -t
+  ```
+- If there aren’t any problems, restart Nginx to enable your changes:
+  ```js
+  sudo systemctl restart nginx
+  ```
 ### 4. Install DBMS (Mysql) with Docker <a name='dbms'></a>
 - Install Mysql image: 
   ```javascript
