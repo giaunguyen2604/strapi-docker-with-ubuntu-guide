@@ -26,7 +26,8 @@ Table of contents:
 ### 2. Add Swap Space <a name='swapspace'></a>
 Source: [Click to go to document](https://www.digitalocean.com/community/tutorials/how-to-add-swap-space-on-ubuntu-16-04)
 
-Include 7 steps:
+Include 6 steps:
+
 **1. Check the System for Swap Information**
 ```javascript
   sudo swapon --show
