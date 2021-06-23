@@ -260,7 +260,8 @@ sudo apt install nginx
   ```javascript
   GRANT ALL PRIVILEGES ON * . * TO ‘nameuser’@‘%’;
   ```
-- Create a database with command: `CREATE DATABASE testDB;`
+- You can check list users with cmd: `SELECT host, user FROM mysql.user;`
+- Create a database with command: `CREATE DATABASE testDB;`
 ### 5. Config Strapi App <a name='cfstrapi'></a>
 - In `config` folder of Strapi App source, , modify the `database.js` file with fields such as `client`, `host`, `post`, `database`, `username`, `password` which match with the information created at step 4.
 - You must install package `mysql2` before: `yarn add mysql2`.
