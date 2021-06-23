@@ -7,6 +7,7 @@ Table of contents:
     - [Docker](#docker)
     - [Nginx](#nginx)
 4. [Install DBMS (Mysql)](#dbms)
+   - [Import *.sql file](#importsqlfile)
 5. [Config Strapi App](#cfstrapi)
 6. [Config Nginx](#cfnginx)
 7. [Add SSL](#ssl)
@@ -262,6 +263,41 @@ sudo apt install nginx
   ```
 - You can check list users with cmd: `SELECT host, user FROM mysql.user;`
 - Create a database with command: `CREATE DATABASE testDB;`
+
+**Copying a sql file to docker container for import**<a name='importsqlfile'></a>
+Source: [Guide](https://grant-bartlett.com/blog/copying-a-sql-file-to-docker-container-for-import/)
+- First find the docker container:
+  ```js
+  docker ps
+  ```
+- This will list out a bunch of container ids. Find the one relating to mysql.
+  ```js
+  CONTAINER ID        IMAGE                   ...
+  [YourContainerId]        mysql:5.7.29       ...CONTAINER ID        IMAGE                   
+  ```
+- Now copy the sql file using `docker cp` into our container.
+  ```js
+  docker cp your.sql [YourContainerId]:/your.sql
+  ```
+- Once complete, we need to login to our container and import to our mysql database.
+  ```js
+  docker exec -it [YourContainerId/name] bash
+  ```
+- Once we're logged in, we can now login to mysql.
+  ```js
+  mysql -u root -p 
+  ```
+  After that, enter the password
+- To see your databases, run `show databases;`.
+- Select the database you're going to be importing to:
+  ```js
+  use your-database-name
+  ```
+- Now import by running:
+  ```js
+  source your.sql
+  ```
+- Done
 ### 5. Config Strapi App <a name='cfstrapi'></a>
 - In `config` folder of Strapi App source, , modify the `database.js` file with fields such as `client`, `host`, `post`, `database`, `username`, `password` which match with the information created at step 4.
 - You must install package `mysql2` before: `yarn add mysql2`.
